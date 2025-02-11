@@ -37,7 +37,7 @@ const loginUser = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: '2',
+      expiresIn: '2d', //the problem was here, it should be '2d' instead of '2'
     });
 
     res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
