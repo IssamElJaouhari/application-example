@@ -12,11 +12,22 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ Validate inputs before sending request
+    if (!name || !email || !password) {
+      setError("All fields are required");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
     try {
       await register(name, email, password);
-      navigate("/dashboard");
+      navigate("/dashboard"); // Redirect after successful registration
     } catch (err) {
-      setError("Registration failed");
+      setError("Registration failed: " + err.response?.data?.message);
     }
   };
 
@@ -28,12 +39,14 @@ const Register = () => {
       >
         <h2 className="text-2xl font-bold mb-4">Register</h2>
         {error && <p className="text-red-500">{error}</p>}
+
         <input
           type="text"
           placeholder="Full Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full p-2 mb-2 border border-gray-300 rounded"
+          required
         />
         <input
           type="email"
@@ -41,6 +54,7 @@ const Register = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 mb-2 border border-gray-300 rounded"
+          required
         />
         <input
           type="password"
@@ -48,7 +62,9 @@ const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-2 mb-2 border border-gray-300 rounded"
+          required
         />
+
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded"

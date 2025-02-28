@@ -7,12 +7,13 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is already logged in
+  // Check if user is already logged in (from localStorage)
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
-    if (token && userData) {
-      setUser(JSON.parse(userData));
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
@@ -30,17 +31,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register function
-  const register = async (name, email, password) => {
-    try {
-      await API.post("/auth/register", { name, email, password });
-      await login(email, password);
-    } catch (error) {
-      console.error("Registration failed:", error.response?.data?.message);
-      throw error;
-    }
-  };
-
   // Logout function
   const logout = () => {
     localStorage.removeItem("token");
@@ -49,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
