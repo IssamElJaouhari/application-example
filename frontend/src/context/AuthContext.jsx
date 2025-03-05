@@ -1,9 +1,10 @@
 import { createContext, useState, useEffect } from "react";
 import API from "../api/axios";
 
+// ✅ Export context separately
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -14,6 +15,7 @@ export const AuthProvider = ({ children }) => {
 
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
+      API.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
     setLoading(false);
   }, []);
@@ -25,6 +27,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setUser(res.data.user);
+      API.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
     } catch (error) {
       console.error("Login failed:", error.response?.data?.message);
       throw error;
@@ -36,6 +39,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
+    delete API.defaults.headers.common["Authorization"];
   };
 
   return (
@@ -44,3 +48,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+// ✅ Fix: Ensure only named exports are used
+export { AuthProvider };
